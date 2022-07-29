@@ -1,5 +1,6 @@
 const express = require("express");
 const router = express.Router();
+const gameService = require("../services/gameService");
 
 router
     .get("/", (req, res) => {
@@ -17,10 +18,10 @@ router
 
         const newMatrix = [];
 
-        for (let i = 0; i < width; i++) {
-            newMatrix[i] = [];
-            for (let j = 0; j < matrix[i].length; j++) {
-                newMatrix[i][j] = matrix[i][j] === 0 ? 1 : 0;
+        for (let j = 0; j < width; j++) {
+            newMatrix[j] = [];
+            for (let i = 0; i < matrix[j].length; i++) {
+                newMatrix[j][i] = gameService.willSurvive(matrix, i, j) ? 1 : 0;
             }
         }
 
