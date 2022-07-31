@@ -34,8 +34,6 @@ const compete = (matrix, x, y, teamPerspective) => {
     const neighbors =
         focusedMatrix.filter((cell) => cell === teamPerspective).length -
         (team === teamPerspective);
-    // console.log(neighbors);
-    // console.log(live);
     const action =
         underpopulated(neighbors, live, team === teamPerspective) ||
         overpopulated(neighbors, live, team === teamPerspective) ||
@@ -50,6 +48,37 @@ const compete = (matrix, x, y, teamPerspective) => {
     };
 };
 
+const dieIfRounded = (matrix, x, y, teamPerspective) => {
+    const team = matrix[y][x];
+
+    if (team === "0" || team === teamPerspective) return "nothing";
+    const sliceFromY = Math.max(y - 1, 0);
+    const sliceFromX = Math.max(x - 1, 0);
+    const sliceToY = Math.min(y + 2, matrix.length);
+    const sliceToX = Math.min(x + 2, matrix[0].length);
+
+    const focusedMatrix = matrix
+        .slice(sliceFromY, sliceToY)
+        .map((row) => row.slice(sliceFromX, sliceToX))
+        .flat();
+
+    const enemyNeighbors = focusedMatrix.filter(
+        (neighbor) => neighbor === teamPerspective
+    ).length;
+
+    // if (enemyNeighbors) console.log(`enemies ${enemyNeighbors}`);
+
+    const myNeighbors =
+        focusedMatrix.filter((neighbor) => neighbor === team).length - 1;
+
+    // if (myNeighbors) console.log(`mine ${myNeighbors}`);
+
+    if (myNeighbors < enemyNeighbors) return "die";
+    if (myNeighbors > enemyNeighbors) return "live";
+    if (myNeighbors === enemyNeighbors) return "tie";
+};
+
 module.exports = {
     compete,
+    dieIfRounded,
 };

@@ -28,10 +28,10 @@ router
             .filter((_) => _ !== undefined)
             .reverse();
 
-        const newMatrix = [];
+        const firstRuleMatrix = [];
 
         for (let j = 0; j < width; j++) {
-            newMatrix[j] = [];
+            firstRuleMatrix[j] = [];
             for (let i = 0; i < matrix[j].length; i++) {
                 let cellContent = null;
 
@@ -68,15 +68,15 @@ router
                 }
 
                 if (cellContent) {
-                    newMatrix[j][i] = cellContent;
+                    firstRuleMatrix[j][i] = cellContent;
                     continue;
                 }
 
                 if (rReproductionStrongSurvival.length === 1) {
-                    newMatrix[j][i] = rReproductionStrongSurvival[0].team;
+                    firstRuleMatrix[j][i] = rReproductionStrongSurvival[0].team;
 
                     console.log(
-                        `reproduction - strong survive: ${newMatrix[j][i]} (${i},${j})`
+                        `reproduction - strong survive: ${firstRuleMatrix[j][i]} (${i},${j})`
                     );
                     continue;
                 }
@@ -103,14 +103,14 @@ router
                 }
 
                 if (cellContent) {
-                    newMatrix[j][i] = cellContent;
+                    firstRuleMatrix[j][i] = cellContent;
                     continue;
                 }
 
                 if (rStrongSurvival.length === 1) {
-                    newMatrix[j][i] = rStrongSurvival[0].team;
+                    firstRuleMatrix[j][i] = rStrongSurvival[0].team;
                     console.log(
-                        `strong survive: ${newMatrix[j][i]} (${i},${j})`
+                        `strong survive: ${firstRuleMatrix[j][i]} (${i},${j})`
                     );
                     continue;
                 }
@@ -125,25 +125,67 @@ router
                             return teams.includes(team);
                         });
 
-                        newMatrix[j][i] = winners.length > 1 ? "0" : winners[0];
+                        firstRuleMatrix[j][i] =
+                            winners.length > 1 ? "0" : winners[0];
                         console.log(
-                            `weak survive contested: ${newMatrix[j][i]} (${i},${j})`
+                            `weak survive contested: ${firstRuleMatrix[j][i]} (${i},${j})`
                         );
                         break;
                     }
                 }
 
                 if (rWeakSurvival.length === 1) {
-                    newMatrix[j][i] = rWeakSurvival[0].team;
-                    console.log(`weak survive: ${newMatrix[j][i]} (${i},${j})`);
+                    firstRuleMatrix[j][i] = rWeakSurvival[0].team;
+                    console.log(
+                        `weak survive: ${firstRuleMatrix[j][i]} (${i},${j})`
+                    );
                     continue;
                 }
 
-                newMatrix[j][i] = "0";
+                firstRuleMatrix[j][i] = "0";
             }
         }
 
-        const newState = newMatrix.flat().join("");
+        const secondRuleMatrix = JSON.parse(JSON.stringify(firstRuleMatrix));
+
+        for (let j = 0; j < width; j++) {
+            for (let i = 0; i < matrix[j].length; i++) {
+                for (let teamPerspective of teams) {
+                    const result = gameService.dieIfRounded(
+                        firstRuleMatrix,
+                        i,
+                        j,
+                        teamPerspective
+                    );
+                    const team = firstRuleMatrix[j][i];
+
+                    if (result === "live") break;
+
+                    if (result === "die") {
+                        secondRuleMatrix[j][i] = "0";
+                        break;
+                    }
+                    if (result === "tie") {
+                        for (let amount in teamCellsSorted) {
+                            const teams = teamCellsSorted[amount];
+                            const winners = [team, teamPerspective]
+                                .map((team) => {
+                                    return teams.includes(team) ? team : null;
+                                })
+                                .filter((_) => _ !== null);
+                            cellContent = winners.length > 1 ? "0" : winners[0];
+                            if (cellContent === undefined) continue;
+
+                            break;
+                        }
+                        secondRuleMatrix[j][i] = cellContent;
+                        break;
+                    }
+                }
+            }
+        }
+
+        const newState = secondRuleMatrix.flat().join("");
 
         res.json({
             board: {
