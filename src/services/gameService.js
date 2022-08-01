@@ -48,7 +48,7 @@ const _compete = (matrix, x, y, teamPerspective) => {
     };
 };
 
-const _dieIfRounded = (matrix, x, y, teamPerspective) => {
+const _dieIfSourrounded = (matrix, x, y, teamPerspective) => {
     const team = matrix[y][x];
 
     if (team === "0" || team === teamPerspective) return "nothing";
@@ -187,7 +187,7 @@ const secondRule = (matrix, teams) => {
     for (let j = 0; j < matrix.length; j++) {
         for (let i = 0; i < matrix[j].length; i++) {
             for (let teamPerspective of teams) {
-                const result = _dieIfRounded(matrix, i, j, teamPerspective);
+                const result = _dieIfSourrounded(matrix, i, j, teamPerspective);
                 const team = matrix[j][i];
 
                 if (result === "live") break;
@@ -222,7 +222,6 @@ const secondRule = (matrix, teams) => {
 };
 
 module.exports = {
-    _dieIfRounded,
     secondRule,
     firstRule,
 };
