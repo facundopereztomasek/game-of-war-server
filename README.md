@@ -16,11 +16,16 @@ Run the next command to start the server:
 npm run dev
 ```
 
+## Testing
+
+Run the next command to perform the tests:
+
+```sh
+npm test
+```
+
 ## To Do
 
--   Teams
-    -   Calculate cell ignoring other teams
-    -   Calculate cell collisions between teams and define winner
 -   Save steps
 
 ## Nice to have
