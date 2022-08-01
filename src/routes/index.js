@@ -1,6 +1,6 @@
 const express = require("express");
 const router = express.Router();
-const gameService = require("../services/gameService");
+const gameController = require("../controllers/gameController");
 
 router
     .get("/", (req, res) => {
@@ -12,15 +12,7 @@ router
         const { body } = req;
         const { width, state, teams } = body.board;
 
-        const matrix = state
-            .match(new RegExp(`.{1,${width}}`, "g"))
-            .map((_) => _.split(""));
-
-        const firstRuleMatrix = gameService.firstRule(matrix, teams);
-
-        const secondRuleMatrix = gameService.secondRule(firstRuleMatrix, teams);
-
-        const newState = secondRuleMatrix.flat().join("");
+        const newState = gameController.getNextStep(width, state, teams);
 
         res.json({
             board: {
