@@ -8,19 +8,6 @@ router
             status: "ok",
         });
     })
-    .post("/step", (req, res) => {
-        const { body } = req;
-        const { width, state, teams } = body.board;
-
-        const newState = gameController.getNextStep(width, state, teams);
-
-        res.json({
-            board: {
-                width,
-                state: newState,
-                teams,
-            },
-        });
-    });
+    .post("/step", gameController.getNextStep);
 
 module.exports = router;

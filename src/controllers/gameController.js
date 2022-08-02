@@ -1,6 +1,9 @@
 const gameService = require("../services/gameService");
 
-const getNextStep = (width, state, teams) => {
+const getNextStep = (req, res) => {
+    const { body } = req;
+    const { width, state, teams } = body.board;
+
     const matrix = state
         .match(new RegExp(`.{1,${width}}`, "g"))
         .map((_) => _.split(""));
@@ -9,7 +12,13 @@ const getNextStep = (width, state, teams) => {
     const secondRuleMatrix = gameService.secondRule(firstRuleMatrix, teams);
     const newState = secondRuleMatrix.flat().join("");
 
-    return newState;
+    res.json({
+        board: {
+            width,
+            state: newState,
+            teams,
+        },
+    });
 };
 
 module.exports = {
